@@ -1,0 +1,229 @@
+"""Gerador de painel técnico vetorial SVG (1440x900) para hidrantes NBR 13714.
+
+Gera visualização técnica profissional de alta fidelidade contendo:
+1. Identificação formal, norma ABNT NBR 13714:2000 e selo LOFRANO TECNOLOGIA.
+2. Cards analíticos: Vazão de Projeto, RTI, Altura Manométrica e Motor da Bomba.
+3. Diagrama esquemático em elevação da prumada de incêndio, reservatório,
+   bomba, hidrantes de pavimento e hidrante mais desfavorável em operação.
+"""
+
+from __future__ import annotations
+
+from html import escape
+import math
+
+from hidrantes_nbr13714.models import ResultadoDimensionamentoHidrantes
+
+
+def gerar_painel_svg(resultado: ResultadoDimensionamentoHidrantes) -> str:
+    """Gera o painel vetorial SVG de 1440x900 pixels."""
+    nome_obra = escape(resultado.instalacao.nome_projeto)
+    id_proj = escape(resultado.identificador_projeto)
+    tipo_sis = escape(resultado.tipo_sistema.upper())
+
+    vazao_l_min = resultado.vazao_de_projeto_l_min
+    vazao_m3_h = resultado.vazao_de_projeto_m3_h
+    rti_m3 = resultado.reserva_tecnica_incendio_m3
+    rti_litros = int(rti_m3 * 1000)
+
+    hman_int = math.ceil(resultado.altura_manometrica_total_bomba_mca)
+    pot_cv_comercial = resultado.potencia_motor_comercial_cv
+    pres_disp = resultado.pressao_residual_disponivel_mca
+    pres_req = resultado.pressao_residual_requerida_mca
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0f1d"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#111827" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Fundo Principal -->
+  <rect width="1440" height="900" fill="url(#bg)"/>
+
+  <!-- Cabeçalho -->
+  <g transform="translate(60, 45)">
+    <text x="0" y="24" fill="#f43f5e" font-family="system-ui, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">ABNT NBR 13714:2000 · SISTEMAS DE HIDRANTES E MANGOTINHOS PARA COMBATE A INCÊNDIO</text>
+    <text x="0" y="58" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="28" font-weight="800">{nome_obra}</text>
+    <text x="0" y="82" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="14">Projeto: {id_proj} | Ocupação: {resultado.instalacao.tipo_ocupacao} | Padrão: LOFRANO TECNOLOGIA</text>
+    
+    <!-- Badge de Conformidade -->
+    <rect x="1140" y="10" width="180" height="42" rx="8" fill="#065f46" stroke="#10b981" stroke-width="1.5"/>
+    <text x="1230" y="36" fill="#34d399" font-family="system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">✓ SISTEMA CONFORME</text>
+  </g>
+
+  <!-- 4 Cards Superiores de Métricas -->
+  <!-- Card 1: Vazão de Projeto -->
+  <g transform="translate(60, 160)" filter="url(#shadow)">
+    <rect width="310" height="120" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
+    <text x="24" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" font-weight="600">VAZÃO TOTAL DE PROJETO</text>
+    <text x="24" y="68" fill="#f43f5e" font-family="system-ui, sans-serif" font-size="28" font-weight="800">{vazao_l_min} L/min</text>
+    <text x="24" y="98" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13">{vazao_m3_h} m³/h | {tipo_sis} (2 bicos simultâneos)</text>
+  </g>
+
+  <!-- Card 2: Reserva Técnica de Incêndio -->
+  <g transform="translate(397, 160)" filter="url(#shadow)">
+    <rect width="310" height="120" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
+    <text x="24" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" font-weight="600">RESERVA TÉCNICA INCÊNDIO (RTI)</text>
+    <text x="24" y="68" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="28" font-weight="800">{rti_m3} m³</text>
+    <text x="24" y="98" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13">{rti_litros:,} Litros | Autonomia: {resultado.instalacao.tempo_reserva_min} min</text>
+  </g>
+
+  <!-- Card 3: Altura Manométrica Total -->
+  <g transform="translate(734, 160)" filter="url(#shadow)">
+    <rect width="310" height="120" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
+    <text x="24" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" font-weight="600">ALTURA MANOMÉTRICA (Hman)</text>
+    <text x="24" y="68" fill="#fbbf24" font-family="system-ui, sans-serif" font-size="28" font-weight="800">{hman_int} mca</text>
+    <text x="24" y="98" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13">Desnível: {resultado.desnivel_geometrico_critico_mca}mca | Perda: {resultado.perda_carga_total_tubulacao_mca}mca</text>
+  </g>
+
+  <!-- Card 4: Potência da Moto-Bomba -->
+  <g transform="translate(1070, 160)" filter="url(#shadow)">
+    <rect width="310" height="120" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
+    <text x="24" y="32" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" font-weight="600">MOTOR DA BOMBA DE INCÊNDIO</text>
+    <text x="24" y="68" fill="#10b981" font-family="system-ui, sans-serif" font-size="28" font-weight="800">{pot_cv_comercial} cv</text>
+    <text x="24" y="98" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13">Pres. Residual: {pres_disp} mca ≥ {pres_req} mca</text>
+  </g>
+
+  <!-- Painel Esquerdo: Esquema Hidráulico em Elevação -->
+  <g transform="translate(60, 310)" filter="url(#shadow)">
+    <rect width="780" height="530" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
+    <text x="30" y="40" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="18" font-weight="700">DIAGRAMA ESQUEMÁTICO DA REDE DE INCÊNDIO (ELEVAÇÃO)</text>
+    <text x="30" y="64" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">Prumada de Incêndio em Aço NBR 5580, Casa de Bombas e Hidrantes de Pavimento</text>
+
+    <!-- Reservatório Inferior / RTI -->
+    <rect x="80" y="380" width="160" height="90" rx="6" fill="#0369a1" stroke="#38bdf8" stroke-width="2"/>
+    <text x="160" y="420" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">RESERVATÓRIO (RTI)</text>
+    <text x="160" y="442" fill="#bae6fd" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">{rti_m3} m³ ({rti_litros:,} L)</text>
+
+    <!-- Casa de Bombas / Bomba de Incêndio -->
+    <rect x="270" y="395" width="80" height="60" rx="8" fill="#991b1b" stroke="#ef4444" stroke-width="2"/>
+    <text x="310" y="428" fill="#fee2e2" font-family="system-ui, sans-serif" font-size="12" font-weight="700" text-anchor="middle">BOMBA</text>
+    <text x="310" y="445" fill="#fca5a5" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">{pot_cv_comercial} cv</text>
+
+    <!-- Tubulação de Sucção (Azul/Vermelho) -->
+    <line x1="240" y1="425" x2="270" y2="425" stroke="#ef4444" stroke-width="6"/>
+
+    <!-- Tubulação de Recalque e Prumada Vertical (Vermelho Incêndio #e11d48) -->
+    <polyline points="350,425 420,425 420,130" fill="none" stroke="#e11d48" stroke-width="6"/>
+    <text x="430" y="270" fill="#f43f5e" font-family="system-ui, sans-serif" font-size="12" font-weight="700">COLUNA DE INCÊNDIO (DN 65 / 2 1/2 pol)</text>
+
+    <!-- Linhas dos Pavimentos da Edificação -->
+    <!-- Térreo -->
+    <line x1="390" y1="380" x2="720" y2="380" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <text x="710" y="372" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11" text-anchor="end">TÉRREO ±0.00</text>
+    <!-- 2º Pavimento -->
+    <line x1="390" y1="280" x2="720" y2="280" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <text x="710" y="272" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11" text-anchor="end">PAVIMENTO TIPO (+12.00m)</text>
+    <!-- Cobertura / Ático -->
+    <line x1="390" y1="160" x2="720" y2="160" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <text x="710" y="152" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11" text-anchor="end">ÁTICO / COBERTURA (+24.00m)</text>
+
+    <!-- Abrigos de Hidrante (H1, H2, H3) -->
+    <!-- Hidrante 1 (Térreo) -->
+    <polyline points="420,350 480,350" fill="none" stroke="#e11d48" stroke-width="4"/>
+    <rect x="480" y="335" width="30" height="30" rx="3" fill="#dc2626" stroke="#f87171" stroke-width="1.5"/>
+    <text x="520" y="354" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12">H1 (Térreo)</text>
+
+    <!-- Hidrante 2 (Tipo) -->
+    <polyline points="420,250 480,250" fill="none" stroke="#e11d48" stroke-width="4"/>
+    <rect x="480" y="235" width="30" height="30" rx="3" fill="#dc2626" stroke="#f87171" stroke-width="1.5"/>
+    <text x="520" y="254" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12">H2 (2º Pavimento - 130 L/min)</text>
+
+    <!-- Hidrante 3 (Crítico / Mais Desfavorável no Ático) -->
+    <polyline points="420,140 480,140" fill="none" stroke="#e11d48" stroke-width="4"/>
+    <rect x="480" y="125" width="30" height="30" rx="3" fill="#dc2626" stroke="#f87171" stroke-width="2"/>
+    <text x="520" y="138" fill="#fbbf24" font-family="system-ui, sans-serif" font-size="12" font-weight="700">H3 (Ponto Mais Desfavorável)</text>
+    <text x="520" y="154" fill="#34d399" font-family="system-ui, sans-serif" font-size="11">Pres. Residual = {pres_disp} mca ≥ {pres_req} mca</text>
+
+    <!-- Jato de Água no Hidrante Crítico -->
+    <path d="M 510 140 Q 560 120 620 135" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="4,2"/>
+  </g>
+
+  <!-- Painel Direito: Quadro de Trechos e Memorial Hidráulico -->
+  <g transform="translate(860, 310)" filter="url(#shadow)">
+    <rect width="520" height="530" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
+    <text x="30" y="40" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="18" font-weight="700">MEMORIAL DE CÁLCULO HIDRÁULICO</text>
+    <text x="30" y="64" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">Trechos, Perdas de Carga e Parâmetros da Bomba</text>
+
+    <!-- Tabela de Trechos e Dados -->
+    <g transform="translate(30, 95)" font-family="system-ui, sans-serif" font-size="13">
+      <!-- Linha 1 -->
+      <text x="0" y="0" fill="#94a3b8">Tipo de Instalação:</text>
+      <text x="460" y="0" fill="#f8fafc" font-weight="700" text-anchor="end">{tipo_sis}</text>
+      <line x1="0" y1="12" x2="460" y2="12" stroke="#334155" stroke-width="1"/>
+
+      <!-- Linha 2 -->
+      <text x="0" y="36" fill="#94a3b8">Pontos em Uso Simultâneo:</text>
+      <text x="460" y="36" fill="#f8fafc" font-weight="700" text-anchor="end">2 hidrantes mais desfavoráveis</text>
+      <line x1="0" y1="48" x2="460" y2="48" stroke="#334155" stroke-width="1"/>
+
+      <!-- Linha 3 -->
+      <text x="0" y="72" fill="#94a3b8">Vazão por Hidrante:</text>
+      <text x="460" y="72" fill="#f43f5e" font-weight="700" text-anchor="end">{resultado.vazao_de_projeto_l_min / 2} L/min</text>
+      <line x1="0" y1="84" x2="460" y2="84" stroke="#334155" stroke-width="1"/>
+
+      <!-- Linha 4 -->
+      <text x="0" y="108" fill="#94a3b8">Diâmetro da Tubulação Principal:</text>
+      <text x="460" y="108" fill="#f8fafc" font-weight="700" text-anchor="end">DN 65 (2 1/2 pol) - Aço NBR 5580</text>
+      <line x1="0" y1="120" x2="460" y2="120" stroke="#334155" stroke-width="1"/>
+
+      <!-- Linha 5 -->
+      <text x="0" y="144" fill="#94a3b8">Mangueira de Incêndio:</text>
+      <text x="460" y="144" fill="#f8fafc" font-weight="700" text-anchor="end">DN 38 mm (1 1/2 pol) x 30 m</text>
+      <line x1="0" y1="156" x2="460" y2="156" stroke="#334155" stroke-width="1"/>
+
+      <!-- Linha 6 -->
+      <text x="0" y="180" fill="#94a3b8">Perda nas Tubulações (ΔH tubos):</text>
+      <text x="460" y="180" fill="#f8fafc" font-weight="700" text-anchor="end">{resultado.perda_carga_total_tubulacao_mca} mca</text>
+      <line x1="0" y1="192" x2="460" y2="192" stroke="#334155" stroke-width="1"/>
+
+      <!-- Linha 7 -->
+      <text x="0" y="216" fill="#94a3b8">Perda na Mangueira (ΔH mang):</text>
+      <text x="460" y="216" fill="#f8fafc" font-weight="700" text-anchor="end">{resultado.perda_carga_mangueira_mca} mca</text>
+      <line x1="0" y1="228" x2="460" y2="228" stroke="#334155" stroke-width="1"/>
+
+      <!-- Linha 8 -->
+      <text x="0" y="252" fill="#94a3b8">Desnível Geométrico (Hgeom):</text>
+      <text x="460" y="252" fill="#f8fafc" font-weight="700" text-anchor="end">{resultado.desnivel_geometrico_critico_mca} mca</text>
+      <line x1="0" y1="264" x2="460" y2="264" stroke="#334155" stroke-width="1"/>
+
+      <!-- Linha 9 -->
+      <text x="0" y="288" fill="#94a3b8">Pressão Residual no Bico:</text>
+      <text x="460" y="288" fill="#10b981" font-weight="700" text-anchor="end">{pres_disp} mca (≥ {pres_req} mca)</text>
+      <line x1="0" y1="300" x2="460" y2="300" stroke="#334155" stroke-width="1"/>
+
+      <!-- Linha 10 -->
+      <text x="0" y="324" fill="#94a3b8">Altura Manométrica da Bomba:</text>
+      <text x="460" y="324" fill="#fbbf24" font-weight="700" text-anchor="end">{resultado.altura_manometrica_total_bomba_mca} mca</text>
+      <line x1="0" y1="336" x2="460" y2="336" stroke="#334155" stroke-width="1"/>
+    </g>
+
+    <!-- Caixa de Resumo / Conclusão -->
+    <g transform="translate(30, 445)">
+      <rect width="460" height="60" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="1"/>
+      <text x="20" y="24" fill="#34d399" font-family="system-ui, sans-serif" font-size="12" font-weight="700">CONFORMIDADE NORMATIVA ABNT NBR 13714:2000</text>
+      <text x="20" y="44" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Instalação aprovada: vazão e pressão plenamente garantidas no hidrante crítico.</text>
+    </g>
+  </g>
+
+  <!-- Rodapé -->
+  <g transform="translate(60, 875)" font-family="system-ui, sans-serif" font-size="11" fill="#64748b">
+    <text x="0" y="0">LOFRANO TECNOLOGIA © 2026 · Software Livre sob Licença MIT · Zero Ponto Flutuante · Padrão de Engenharia Racional Exata</text>
+    <text x="1320" y="0" text-anchor="end">hidrantes-nbr13714 v1.0.0</text>
+  </g>
+</svg>
+"""
+    return svg

@@ -1,0 +1,41 @@
+{
+  "nome_projeto": "Centro Empresarial Paulista",
+  "tipo_ocupacao": "Comercial Escritórios e Lojas",
+  "tipo_sistema_adotado": "tipo_3",
+  "cota_reservatorio_bomba_m": "0",
+  "tempo_reserva_min": 60,
+  "trechos": [
+    {
+      "identificador": "Sucção da Bomba",
+      "diametro_chave": "3_pol",
+      "comprimento_linear_m": "5",
+      "vazao_l_min": "400",
+      "desnivel_geometrico_m": "0",
+      "conexoes": {
+        "valvula_gaveta": 1,
+        "joelho_90": 1
+      }
+    },
+    {
+      "identificador": "Barrilete e Prumada",
+      "diametro_chave": "2_1_2_pol",
+      "comprimento_linear_m": "35",
+      "vazao_l_min": "400",
+      "desnivel_geometrico_m": "30",
+      "conexoes": {
+        "valvula_retencao": 1,
+        "valvula_gaveta": 1,
+        "joelho_90": 3
+      }
+    }
+  ],
+  "hidrantes": [
+    {
+      "identificador": "H_Critico",
+      "tipo_sistema": "tipo_3",
+      "pavimento": "Cobertura",
+      "cota_geometrica_m": "30",
+      "comprimento_mangueira_m": 30
+    }
+  ]
+}

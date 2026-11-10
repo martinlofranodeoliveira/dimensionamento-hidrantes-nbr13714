@@ -1,0 +1,68 @@
+{
+  "nome_projeto": "Edifício Residencial Belo Horizonte",
+  "tipo_ocupacao": "Residencial Multifamiliar",
+  "tipo_sistema_adotado": "tipo_2",
+  "cota_reservatorio_bomba_m": "0",
+  "tempo_reserva_min": 30,
+  "trechos": [
+    {
+      "identificador": "Sucção da Bomba",
+      "diametro_chave": "2_1_2_pol",
+      "comprimento_linear_m": "4",
+      "vazao_l_min": "260",
+      "desnivel_geometrico_m": "0",
+      "conexoes": {
+        "valvula_gaveta": 1,
+        "joelho_90": 1
+      }
+    },
+    {
+      "identificador": "Coluna de Recalque",
+      "diametro_chave": "2_1_2_pol",
+      "comprimento_linear_m": "28",
+      "vazao_l_min": "260",
+      "desnivel_geometrico_m": "24",
+      "conexoes": {
+        "valvula_retencao": 1,
+        "valvula_gaveta": 1,
+        "joelho_90": 2,
+        "te_passagem_direta": 2
+      }
+    },
+    {
+      "identificador": "Ramal Hidrante Crítico",
+      "diametro_chave": "2_1_2_pol",
+      "comprimento_linear_m": "6",
+      "vazao_l_min": "130",
+      "desnivel_geometrico_m": "0",
+      "conexoes": {
+        "te_saida_lateral": 1,
+        "joelho_90": 1,
+        "valvula_gaveta": 1
+      }
+    }
+  ],
+  "hidrantes": [
+    {
+      "identificador": "H1",
+      "tipo_sistema": "tipo_2",
+      "pavimento": "Térreo",
+      "cota_geometrica_m": "1",
+      "comprimento_mangueira_m": 30
+    },
+    {
+      "identificador": "H2",
+      "tipo_sistema": "tipo_2",
+      "pavimento": "3º Pavimento",
+      "cota_geometrica_m": "12",
+      "comprimento_mangueira_m": 30
+    },
+    {
+      "identificador": "H3",
+      "tipo_sistema": "tipo_2",
+      "pavimento": "Ático / Cobertura",
+      "cota_geometrica_m": "24",
+      "comprimento_mangueira_m": 30
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "nome_projeto": "Galpão Industrial Mauá",
+  "tipo_ocupacao": "Industrial / Logística",
+  "tipo_sistema_adotado": "tipo_4",
+  "cota_reservatorio_bomba_m": "0",
+  "tempo_reserva_min": 60,
+  "trechos": [
+    {
+      "identificador": "Sucção da Bomba",
+      "diametro_chave": "4_pol",
+      "comprimento_linear_m": "6",
+      "vazao_l_min": "600",
+      "desnivel_geometrico_m": "0",
+      "conexoes": {
+        "valvula_gaveta": 1,
+        "joelho_90": 1
+      }
+    },
+    {
+      "identificador": "Rede Externa Enterrada",
+      "diametro_chave": "3_pol",
+      "comprimento_linear_m": "80",
+      "vazao_l_min": "600",
+      "desnivel_geometrico_m": "2",
+      "conexoes": {
+        "valvula_retencao": 1,
+        "valvula_gaveta": 2,
+        "joelho_90": 4
+      }
+    }
+  ],
+  "hidrantes": [
+    {
+      "identificador": "H_Externo_Mais_Distante",
+      "tipo_sistema": "tipo_4",
+      "pavimento": "Pátio Logístico",
+      "cota_geometrica_m": "2",
+      "comprimento_mangueira_m": 30
+    }
+  ]
+}

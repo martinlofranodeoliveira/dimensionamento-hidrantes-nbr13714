@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dimensionamento-hidrantes-nbr13714"
+version = "1.0.0"
+description = "Motor analítico e CLI para dimensionamento de sistemas de hidrantes e mangotinhos conforme ABNT NBR 13714:2000 em Python puro com aritmética exata."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "Lofrano Tecnologia", email = "contato@lofranotecnologia.com.br" }
+]
+keywords = [
+    "engenharia-civil",
+    "combate-a-incendio",
+    "nbr-13714",
+    "hidrantes",
+    "mangotinhos",
+    "bomba-incendio",
+    "reserva-tecnica-incendio",
+    "perda-de-carga",
+    "hazen-williams",
+    "python-puro"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed"
+]
+dependencies = []
+
+[project.scripts]
+hidrantes-nbr13714 = "hidrantes_nbr13714.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+hidrantes_nbr13714 = ["py.typed"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-v"
